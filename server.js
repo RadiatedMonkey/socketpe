@@ -173,27 +173,33 @@ module.exports = { // Export startServer function so it can be used in other scr
                                 });
                             });
                             
-                            if(res.body.properties.Message.startsWith(`${config.command_prefix}copy`)) {
-                                let params = res.body.properties.Message.split(" ").slice(1);
-                                commandSender = res.body.properties.Sender;
-                                copyModel(params[0], params[1], params[2]);
-                            } else if(res.body.properties.Message.startsWith(`${config.command_prefix}export`)) {  
-                                commandSender = res.body.properties.Sender;     // Parse commands and execute corresponding functions
-                                exportModel();
-                            } else if(res.body.properties.Message.startsWith(`${config.command_prefix}import`)) {
-                                commandSender = res.body.properties.Sender;
-                                importModel();
-                            } else if(res.body.properties.Message.startsWith(`${config.command_prefix}set`)) {
-                                commandSender = res.body.properties.Sender;
-                                setAreaInit();
-                            }
+                            let cmds = {
+                                copy: copyArea,
+                                export: exportModel,
+                                import: importModel,
+                                set: setArea
+                            };
+
+                            Object.keys(cmds).forEach(item => {
+                                if(res.body.properties.Message.startsWith(`!${item}`)) cmds[item]();
+                            });
                         }
                     }
+
+
+
+
+
+                    // Functions
     
-                    function copyModel(width, height, length) {
+                    function copyArea() {
+
+                        let width = Number(res.body.properties.Message.split(" ").slice(1)[0]);
+                        let height = Number(res.body.properties.Message.split(" ").slice(1)[1]);
+                        let length = Number(res.body.properties.Message.split(" ").slice(1)[2])
+                        
                         showProgress[commandSender] = true;
                         currentCoords[commandSender] = 0;
-                        width = Number(width); height = Number(height); length = Number(length);
                         let coords = create3DCoords(width, height, length);
                         totalCopyBlocks[commandSender] = (width + 1) * (height + 1) * (length + 1) - 2;
                         coordHistory[commandSender] = [];
@@ -208,15 +214,16 @@ module.exports = { // Export startServer function so it can be used in other scr
                                     sendCMD(`testforblock ~${cCrds[0]} ~${cCrds[1]} ~${cCrds[2]} sponge 15`);
                                     coordIdx++;
                                     if(coordIdx < coords.length -1) read();
-                                    else {
-                                        sendCMD(`tellraw \"${commandSender}\" {"rawtext":[{"text":"Copy has finished, use ${config.command_prefix}export [modelname] to export it"}]}`);
-                                    }
                                 }, config.copy_delay);
                             }
                             read();
                         }
                         readBlocks();
                     }
+
+
+
+                    //Exporting copied areas to files
     
                     function exportModel() {
                         let model = res.body.properties.Message.split(' ')[1]; // Write model to file
@@ -227,9 +234,13 @@ module.exports = { // Export startServer function so it can be used in other scr
                                 sendCMD(`tellraw \"${commandSender}\" {"rawtext":[{"text":"Exported to ${config.model_dir}/${model}.json"}]}`);
                             }
                         
-                    });
-                    tempBlocks[commandSender] = [];
+                        });
+                        tempBlocks[commandSender] = [];
                     }
+
+
+
+                    // Loading models
     
                     function importModel() {
                         let modelName = res.body.properties.Message.split(" ")[1];
@@ -251,8 +262,21 @@ module.exports = { // Export startServer function so it can be used in other scr
                             sendCMD(`tellraw \"${commandSender}\" {"rawtext":[{"text":"${modelName} does not exist in ${config.model_dir}"}]}`);
                         }
                     }
+
+
+
+                    // Paste copied area
+
+                    function pasteArea() {
+
+                    }
+
+
+
+
+                    // Filling area
     
-                    function setAreaInit(params) {
+                    function setArea() {
     
                         const allParams = res.body.properties.Message;
                         params = allParams.replace(`${config.command_prefix}set `, '').split(' ');
@@ -262,10 +286,10 @@ module.exports = { // Export startServer function so it can be used in other scr
                         if(config.fill_limit) {
                             if(coordsLength > config.fill_limit) {
                                 sendCMD(`tellraw \"${commandSender}\" {"rawtext":[{"text":"You are trying to place more blocks than the fill limit set in config.json (${coords[0] * coords[1] * coords[2]} > ${config.fill_limit})"}]}`);
-                            } else setArea();
-                        } else setArea();
+                            } else execSetArea();
+                        } else execSetArea();
                         
-                        function setArea() {
+                        function execSetArea() {
     
                             let blocks = params[params.length - 1]; 
                             blocks = blocks.split(",");                      // Parse input : Blocks = block names, blockCounts = how many times the block should be placed
@@ -346,7 +370,7 @@ module.exports = { // Export startServer function so it can be used in other scr
                     process.stdout.cursorTo(0);
                     process.stdout.write('Server listening on port 19131\n');
                     console.log('Connect to the server with: /connect localhost:19131');
-                    if(customFunctions !== []) console.log('\nStarting custom functions\n');
+                    if(customFunctions.length > 0) console.log('\nStarting custom functions\n');
                     customFunctions.forEach(item => {
                         if(item.__init__) item.__init__();
                     });

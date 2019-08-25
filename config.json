@@ -1,5 +1,4 @@
 {
     "model_dir":"*",
-    "place_delay": 10,
-    "enable_viewer": true
+    "place_delay": 10
 } 
