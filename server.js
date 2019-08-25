@@ -15,13 +15,13 @@ module.exports = { // Export startServer function so it can be used in other scr
         let serverStarted = false;                      // Special variables
         let config;
 
-        let tempBlocks = [];
-        let currentCoords = 0;                          // Global variables
-        let coordHistory = [];
+        let tempBlocks = {};
+        let currentCoords = {};                          // Global variables
+        let coordHistory = {};
         let commandSender;
         let customFunctions = [];
-        let totalCopyBlocks = 0;
-        let showProgress = false;
+        let totalCopyBlocks = {};
+        let showProgress = {};
 
         if(fs.existsSync('./config.json')) {
             let cConfig = fs.readFileSync('./config.json');
@@ -145,21 +145,21 @@ module.exports = { // Export startServer function so it can be used in other scr
                             tempBlockName = tempBlockName.toLowerCase().replace(/ /g, "_"); 
 
                             if(tempBlockName !== 'air') {
-                                tempBlocks.push({                // Add block to model array if not air
+                                tempBlocks[commandSender].push({                // Add block to model array if not air
                                     n: tempBlockName,
                                     i: 0,
-                                    c: coordHistory[currentCoords]
+                                    c: coordHistory[commandSender][currentCoords[commandSender]]
                                 });
                             }
 
-                            let copyProgress = Math.round(((currentCoords / totalCopyBlocks) * 100) / 4);
+                            let copyProgress = Math.round(((currentCoords[commandSender] / totalCopyBlocks[commandSender]) * 100) / 4);
                             if(copyProgress === 25) {
                                 sendCMD(`title @s actionbar <▋▋▋▋▋▋▋▋▋▋▋▋▋▋▋▋▋▋▋▋▋▋▋▋▋> Done`);
-                                showProgress = false;
+                                showProgress[commandSender] = false;
                             } else if(showProgress) {
                                 let progressBar = '▋'.repeat(copyProgress) + '. '.repeat(25 - copyProgress < 0 ? 0 : 25 - copyProgress);
                                 sendCMD(`title @s actionbar <${progressBar}> ${copyProgress * 4} percent`);
-                                currentCoords++;
+                                currentCoords[commandSender]++;
                             }
                         }
                     }
@@ -191,18 +191,20 @@ module.exports = { // Export startServer function so it can be used in other scr
                     }
     
                     function copyModel(width, height, length) {
-                        showProgress = true;
-                        currentCoords = 0;
+                        showProgress[commandSender] = true;
+                        currentCoords[commandSender] = 0;
                         width = Number(width); height = Number(height); length = Number(length);
                         let coords = create3DCoords(width, height, length);
-                        totalCopyBlocks = (width + 1) * (height + 1) * (length + 1) - 2;
-    
+                        totalCopyBlocks[commandSender] = (width + 1) * (height + 1) * (length + 1) - 2;
+                        coordHistory[commandSender] = [];
+                        tempBlocks[commandSender] = [];
+
                         function readBlocks() {
                             let coordIdx = 0;
                             function read() {
                                 setTimeout(function() {
                                     let cCrds = coords[coordIdx];  //Execute testforblock command for every coordinate in the coordinates array
-                                    coordHistory.push(cCrds);
+                                    coordHistory[commandSender].push(cCrds);
                                     sendCMD(`testforblock ~${cCrds[0]} ~${cCrds[1]} ~${cCrds[2]} sponge 15`);
                                     coordIdx++;
                                     if(coordIdx < coords.length -1) read();
@@ -218,7 +220,7 @@ module.exports = { // Export startServer function so it can be used in other scr
     
                     function exportModel() {
                         let model = res.body.properties.Message.split(' ')[1]; // Write model to file
-                        fs.writeFile(`${config.model_dir}/${model}.json`, JSON.stringify(convert.convertDataValues(tempBlocks)), function(err) {
+                        fs.writeFile(`${config.model_dir}/${model}.json`, JSON.stringify(convert.convertDataValues(tempBlocks[commandSender])), function(err) {
                             if(err) {
                                 sendCMD(`tellraw \"${commandSender}\" {"rawtext":[{"text":"An error occurred try to save the model: ${err}"}]}`);
                             } else {
@@ -226,7 +228,7 @@ module.exports = { // Export startServer function so it can be used in other scr
                             }
                         
                     });
-                    tempBlocks = [];
+                    tempBlocks[commandSender] = [];
                     }
     
                     function importModel() {
