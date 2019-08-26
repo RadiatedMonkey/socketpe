@@ -38,12 +38,13 @@ const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const socketServer = require('./wsserver/server');
+const path = require('path');
 
-app.get('/', (req, res) => {
-    res.redirect('/control-panel');
+app.get('/favicon.png', (req, res) => {
+    res.sendFile(path.join(__dirname, '/web/favicon.png'));
 });
 
-app.use('/console', express.static('web/console'));
+app.use('/', express.static('web/console'));
 app.use('/config', express.static('web/config'));
 
 app.use('/viewer', express.static('model-viewer'));
@@ -52,6 +53,7 @@ io.on('connection', socket => {
     socket.emit("connected", {message: "success"}); 
  
     socket.on('changeState', data => {
+        socketServer.controlSocket = socket;
         if(data.state) socketServer.start(socket);
         else socketServer.stop();
     });

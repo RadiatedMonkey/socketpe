@@ -2,23 +2,28 @@ module.exports = {
     app: require('express')(),
     server: require('http').Server(module.exports.app),
     logHistory: [],
-    start: socket => {
+    controlSocket: null,
+    wss: null,
+    log: msg => {
+        module.exports.controlSocket.emit("log", {message: msg});
+        module.exports.logHistory.push(msg);
+    },
+    stop: () => {
+        module.exports.wss.close();
+        module.exports.server.close();
+        module.exports.log('Server successfully shut down');
+    },
+    start: () => {
         "use strict";
 
-        function log(str) {
-            socket.emit("log", {message: str});
-            module.exports.logHistory.push(str);
-        }
-
-        process.on('uncaughtException', err => {
-            fs.appendFileSync('../errors.log', `[${new Date().toLocaleDateString()}: ${new Date().toLocaleTimeString()}] ${err}\n`);
-            log(`Exception occurred: ${err}`);
-        });
+        /*process.on('uncaughtException', err => {
+            fs.appendFileSync('../errors.module.exports.log', `[${new Date().toLocaleDateString()}: ${new Date().toLocaleTimeString()}] ${err}\n`);
+            module.exports.log(`Error occurred: ${err}`);
+        });*/
 
         const WebSocket = require('ws');      // Requires
         const uuid = require('uuid/v4');
         const fs = require('fs');
-        const path = require('path');
         const convert = require('./convert');
                               
         let config = {
@@ -40,10 +45,10 @@ module.exports = {
         //     let cConfig = fs.readFileSync('./config.json');
         //     config = JSON.parse(fs.readFileSync('./config.json'));
         //     if(!config.model_dir) {
-        //         log(`Missing model_dir option in config.json, using ${__dirname}/models`);
+        //         module.exports.log(`Missing model_dir option in config.json, using ${__dirname}/models`);
         //         cConfig.model_dir = `${__dirname}/models`;
         //         fs.writeFile('config.json', JSON.stringify(cConfig), err => {
-        //             if(err) log(err);
+        //             if(err) module.exports.log(err);
         //         });
         //         config = cConfig;
         //     } else if(config.model_dir === '*') config.model_dir = __dirname + '/models';
@@ -64,7 +69,7 @@ module.exports = {
             
 
         // } else {
-        //     log('Could not find config.json, please create it and restart the program');
+        //     module.exports.log('Could not find config.json, please create it and restart the program');
         //     setInterval(function() {});
         // }
 
@@ -94,9 +99,9 @@ module.exports = {
             return tempCoords;
         }
         
-        const wss = new WebSocket.Server({server: module.exports.server});
+        module.exports.wss = new WebSocket.Server({server: module.exports.server});
 
-        wss.on('connection', (socket, req) => {
+        module.exports.wss.on('connection', (socket, req) => {
 
             function sendCMD(cmd) {
                 socket.send(JSON.stringify({
@@ -116,22 +121,22 @@ module.exports = {
                 }));
             }
 
-            log('Connection requested');
+            module.exports.log('Connection requested');
             // if(config.trusted_ips) {
             //     if(config.trusted_ips.some(function(ip) {
             //         return ip === req.connection.remoteAddress;
             //     })) {
-            //         log('Connection accepted');
+            //         module.exports.log('Connection accepted');
             //     } else {
-            //         log(`Connection refused (IP: ${req.connection.remoteAddress})`);
+            //         module.exports.log(`Connection refused (IP: ${req.connection.remoteAddress})`);
             //         setTimeout(function() {
-            //             socket.close();
+            //             socket.destroy();
             //         }, 250);
             //     }
             // } else {
-            //     log('Connection accepted');
+            //     module.exports.log('Connection accepted');
             // }
-            log('Connection accepted');
+            module.exports.log('Connection accepted');
 
             socket.send(subscribeChat());
 
@@ -140,7 +145,7 @@ module.exports = {
 
                 if(res.body.statusMessage) {
                     if(/(Syntax error: |Too many)/g.test(res.body.statusMessage)) {
-                        log(`[${new Date().toTimeString()}] ${res.body.statusMessage}`); // Log any errors or warnings send by Minecraft to the console
+                        module.exports.log(`[${new Date().toTimeString()}] ${res.body.statusMessage}`); // module.exports.log any errors or warnings send by Minecraft to the console
                         sendCMD(`tellraw \"${commandSender}\" {"rawtext":[{"text":"${res.body.statusMessage}"}]}`)
                     }
                     if(res.body.statusMessage.includes("(expected: ")) {
@@ -210,7 +215,7 @@ module.exports = {
                     let height = Number(res.body.properties.Message.split(" ").slice(1)[1]);
                     let length = Number(res.body.properties.Message.split(" ").slice(1)[2])
 
-                    log(`Copying a ${width}x${height}x${length} area (requested by: ${commandSender})`);
+                    module.exports.log(`Copying a ${width}x${height}x${length} area (requested by: ${commandSender})`);
                     
                     showProgress[commandSender] = true;
                     currentCoords[commandSender] = 0;
@@ -249,7 +254,7 @@ module.exports = {
                         }
                     
                     });
-                    log(`Exported ${commandSender}'s copied area to ${config.model_dir}/${model}.model.json`);
+                    module.exports.log(`Exported ${commandSender}'s copied area to ${config.model_dir}/${model}.model.json`);
                 }
 
 
@@ -272,10 +277,10 @@ module.exports = {
                             }, config.place_delay);
                         }
                         placeBlock(0);
-                        log(`${commandSender} has imported ${modelName}`);
+                        module.exports.log(`${commandSender} has imported ${modelName}`);
                     } else {
                         sendCMD(`tellraw \"${commandSender}\" {"rawtext":[{"text":"${modelName} does not exist in ${config.model_dir}"}]}`);
-                        log(`${commandSender} tried to import a model that does not exist`);
+                        module.exports.log(`${commandSender} tried to import a model that does not exist`);
                     }
                 }
 
@@ -381,13 +386,12 @@ module.exports = {
 
         module.exports.server.listen(19131, () => {
             setTimeout(function() {
-                log('Server is running');
-                log('Connect to the server with: /connect localhost:19131');
-                if(customFunctions.length > 0) log('\nStarting custom functions\n');
+                module.exports.log('Server is running');
+                module.exports.log('Connect to the server with: /connect localhost:19131');
+                if(customFunctions.length > 0) module.exports.log('\nStarting custom functions\n');
                 customFunctions.forEach(item => {
                     if(item.__init__) item.__init__();
                 });
-                socket.emit('wsStarted', {});
             }, 500);
         });
     }

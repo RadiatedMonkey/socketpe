@@ -8,6 +8,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="console.css">
+    <link rel="shortcut icon" href="../favicon.png">
     <title>SocketPE - Control Panel</title>
   </head>
   <body>
@@ -19,15 +20,50 @@
     <h3 class="m-4">Control Panel</h3>
     <hr />
 
-    <button class="btn btn-outline-dark ml-4 mr-2" id="serverStateChanger">Start server</button>
-    <button class="btn btn-outline-dark ml-2" id="clearConsole">Clear console</button>
-    <div id="console" class="bg-dark text-white m-4 pt-3">
-        <div class="bg-light p-3" id="console-control">
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-        </div>
-        <div id="console-output"></div>
+    <div class="row">
+      <div class="col">
+          <h5 class="text-center">Console</h5>
+          <hr />
+          <button class="btn btn-dark ml-4 mr-4" id="serverStateChanger">Start server</button>
+          <button class="btn btn-outline-dark mr-2" id="restartServer">Restart</button>
+          <button class="btn btn-outline-dark" id="clearConsole">Clear console</button>
+          <div id="console" class="bg-dark text-white m-4 pt-3">
+              <div class="bg-light p-3" id="console-control">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+              </div>
+              <div id="console-output"></div>
+          </div>
+      </div>
+      <div class="col">
+        <h5 class="text-center">Featured</h5>
+        <hr />
+        <button class="btn btn-dark ml-4" id="downloadCurrentPack">Download this pack</button>
+        <div id="featured_packs" class="carousel slide bg-dark m-4" data-ride="carousel" data-interval="5000">
+
+            <!-- Indicators -->
+            <ol class="carousel-indicators">
+              <li data-target="#featured_packs" data-slide-to="0" class="active"></li>
+            </ol>
+          
+            <!-- The slideshow -->
+            <div class="carousel-inner">
+              <div class="carousel-item active">
+                <h3 class="text-center text-white">Featured Function Packs</h3>
+              </div>
+            </div>
+          
+            <!-- Left and right controls -->
+            <a class="carousel-control-prev" href="#featured_packs" data-slide="prev">
+              <span class="carousel-control-prev-icon"></span>
+            </a>
+            <a class="carousel-control-next text-dark" href="#featured_packs" data-slide="next">
+              <span class="carousel-control-next-icon"></span>
+            </a>
+          
+          </div>
+      </div>
     </div>
 
     <!-- Optional JavaScript -->
