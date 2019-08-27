@@ -4,6 +4,7 @@ module.exports = {
     logHistory: [],
     controlSocket: null,
     wss: null,
+    installedFunctions: [],
     log: msg => {
         module.exports.controlSocket.emit("log", {message: msg});
         module.exports.logHistory.push(msg);
@@ -16,15 +17,16 @@ module.exports = {
     start: () => {
         "use strict";
 
-        /*process.on('uncaughtException', err => {
+        process.on('uncaughtException', err => {
             fs.appendFileSync('../errors.module.exports.log', `[${new Date().toLocaleDateString()}: ${new Date().toLocaleTimeString()}] ${err}\n`);
             module.exports.log(`Error occurred: ${err}`);
-        });*/
+        });
 
         const WebSocket = require('ws');      // Requires
         const uuid = require('uuid/v4');
         const fs = require('fs');
         const convert = require('./convert');
+        const path = require('path');
                               
         let config = {
             "model_dir": __dirname + "/models",
@@ -36,7 +38,6 @@ module.exports = {
         let currentCoords = {};                          // Global variables
         let coordHistory = {};
         let commandSender;
-        let customFunctions = [];
         let totalCopyBlocks = {};
         let showProgress = {};
 
@@ -59,7 +60,7 @@ module.exports = {
         
         //     if(config.custom_functions) {
         //         config.custom_functions.forEach(item => {
-        //             customFunctions.push(require(process.cwd() + "/" + item));
+        //             module.exports.installedFunctions.push(require(process.cwd() + "/" + item));
         //         });
         //     }
         //     if(config.enable_viewer) {
@@ -72,6 +73,19 @@ module.exports = {
         //     module.exports.log('Could not find config.json, please create it and restart the program');
         //     setInterval(function() {});
         // }
+
+        fs.readdir(path.join(__dirname, '../functions'), (err, files) => {
+            if(err) module.exports.log(`An error occurred while detecting function packs: ${err}`);
+            else {
+                if(files.length < 1) module.exports.log('No function packs installed');
+                else {
+                    files.forEach(file => {
+                        module.exports.module.exports.installedFunctions.push(require(path.join(__dirname, `../functions/${file}`)));
+                    });
+                    module.exports.log(`Loaded ${files.length} ${files.length > 2 ? 'functions packs' : 'function pack'}`);
+                }
+            }
+        });
 
         function subscribeChat() {
             return JSON.stringify({
@@ -178,7 +192,7 @@ module.exports = {
                 if (res.header.messagePurpose === 'event' && res.body.properties.Sender !== 'External') {
                     if(res.body.eventName === 'PlayerMessage') {
 
-                        customFunctions.forEach(item => {
+                        module.exports.installedFunctions.forEach(item => {
                             Object.keys(item).forEach(func => {
                                 if(func === res.body.properties.Message.split(" ")[0].replace(config.command_prefix, "")) item[func](res.body, sendCMD, config);
                             });
@@ -300,7 +314,7 @@ module.exports = {
                 function setArea() {
 
                     const allParams = res.body.properties.Message;
-                    params = allParams.replace(`${config.command_prefix}set `, '').split(' ');
+                    let params = allParams.replace(`${config.command_prefix}set `, '').split(' ');
                     let coords = params.slice(0, 3).map(Number);            // Parse input
                     let coordsLength = coords.reduce((a, b) => a *= b);
 
@@ -386,10 +400,8 @@ module.exports = {
 
         module.exports.server.listen(19131, () => {
             setTimeout(function() {
-                module.exports.log('Server is running');
-                module.exports.log('Connect to the server with: /connect localhost:19131');
-                if(customFunctions.length > 0) module.exports.log('\nStarting custom functions\n');
-                customFunctions.forEach(item => {
+                module.exports.log('Server is running, connect to it with: /connect localhost:19131');
+                module.exports.installedFunctions.forEach(item => {
                     if(item.__init__) item.__init__();
                 });
             }, 500);

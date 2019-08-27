@@ -1,3 +1,11 @@
+body {
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+}
+nav {
+    box-shadow: 0 10px 10px 0 #dddddd25;
+}
 #console {
     display: block;
     height: 500px;
@@ -18,7 +26,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     overflow-wrap: break-word;
-    height: 90.25%;
+    min-height: 90.25%;
     padding-top: 1%;
 }
 #console-output::-webkit-scrollbar-track {
@@ -26,6 +34,16 @@
     box-shadow: inset 0 0 6px #00000030;
 	border-radius: 10px;
 	background-color: #F5F5F5;
+}
+#console-titlebar {
+    box-shadow: 0 5px 5px 0 #eeeeee25;
+}
+#packsContainer {
+    height: 77.5%;
+}
+.pack-info {
+    display: inline-block;
+    width: 25vw;
 }
 .dot {
     height: 15px;

@@ -2,33 +2,20 @@ const socket = io();
 const serverStateChanger = document.getElementById('serverStateChanger');
 const clearConsoleBtn = document.getElementById('clearConsole');
 const socketConsole = document.getElementById('console-output');
-const restartServerBtn = document.getElementById('restartServer');
+const installedPacksList = document.getElementById('installed-packs');
 let serverRunning = false;
 
-async function loadCarouselData() {
-    const carouselIndicators = document.getElementsByClassName('carousel-indicators')[0];
-    const carouselInner = document.getElementsByClassName('carousel-inner')[0];
-
-    let carouselItems = [];
-    let featuredPacks = await fetch('https://raw.githubusercontent.com/RadiatedMonkey/socketpe-data/master/featured_packs.json');
-    featuredPacks = await featuredPacks.json();
-    
-    featuredPacks.forEach((item, idx) => {
-        carouselIndicators.innerHTML += `<li data-target="#featured_packs" data-slide-to="${idx + 1}"></li>`;
-        carouselInner.innerHTML += `<div class="carousel-item"><h3 class="text-center text-white">${item.name}</h3><button class="downloadPack-btn btn btn-light" onclick="window.open('https://github.com/RadiatedMonkey/socketpe-data/blob/master/function_packs/${item.pack_name}.js')">Download</button></div>`;
-    });
-}
-loadCarouselData();
-
 // Event listeners
+
+document.addEventListener('DOMContentLoaded', e => {
+    socket.emit('detectInstalledPacks', {});
+});
 
 socket.on('disconnect', () => {
     Swal.fire({
         type: 'error',
         title: 'Disconnected',
         text: 'Your SocketPE server went offline',
-        timer: 5000,
-        showCloseButton: true,
         showConfirmButton: false
     });
     serverStateChanger.textContent = 'Server unavailable';
@@ -41,8 +28,6 @@ socket.on('reconnect', () => {
         type: 'success',
         title: 'Reconnected',
         text: 'You have been reconnected to the server',
-        timer: 5000,
-        showCloseButton: true,
         showConfirmButton: false
     });
     clearSocketConsole();
@@ -53,6 +38,20 @@ socket.on('reconnect', () => {
 
 socket.on('log', data => {
     socketConsole.innerHTML += `<span>${data.message}</span>`;
+});
+
+socket.on('displayInstalledPacks', data => {
+    console.log(data.packs.length);
+    installedPacksList.classList.remove('row');
+    installedPacksList.innerHTML = '';
+    if(data.packs.length === 0) installedPacksList.innerHTML = '<h5 class="text-dark text-center">No installed function packs detected</h5>';
+    else {
+        data.packs.forEach(pack => {
+            installedPacksList.innerHTML += ` 
+                <div class="pack-info jumbotron bg-secondary text-white p-3 rounded">${pack.name}<button class="btn btn-light float-right uninstall-pack" disabled onclick="socket.emit('uninstallPack', {packName: '${pack.pack_name}'})">Uninstall</button></div>  
+            `;
+        });
+    }
 });
 
 serverStateChanger.addEventListener('click', e => {
@@ -66,12 +65,8 @@ serverStateChanger.addEventListener('click', e => {
     socket.emit('changeState', {state: serverRunning}); 
 });
 
-restartServerBtn.addEventListener('click', e => {
-
-});
-
 clearConsoleBtn.addEventListener('click', clearSocketConsole);
 
-function clearSocketConsole(){ socketConsole.innerHTML = ''; }
-
 // Functions
+
+function clearSocketConsole(){ socketConsole.innerHTML = ''; }
