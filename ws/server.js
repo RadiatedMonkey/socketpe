@@ -8,7 +8,9 @@ module.exports = {
     wssRunning: false,
     functionPacks: [],
     log: msg => {
-        module.exports.controlSocket.emit("log", {message: msg});
+        const universalEmitter = require('../common').universalEmitter;
+        universalEmitter.emit('log', msg);
+
         module.exports.logHistory.push(msg);
     },
     runCMD: cmd => {
@@ -79,31 +81,40 @@ module.exports = {
         module.exports.wss.on('listening', () => {
             module.exports.log('Server is running, connect to it with: /connect localhost:19131');
             module.exports.wssRunning = true;
+            console.log(module.exports.wssRunning);
+
+            module.exports.functionPacks.forEach(pack => {
+                let tempPack = pack;
+                module.exports.log(pack);
+                delete tempPack.manifest;
+                delete tempPack.__init__;
+                module.exports.log(tempPack);
+            });
         });
 
         module.exports.wss.on('connection', socket => {
             module.exports.mcSocket = socket;
 
-            socket.send(subscribeChat());
-            socket.on('message', packet => {
-                const res = JSON.parse(packet);
+            // socket.send(subscribeEvent(eventName));
+            // socket.on('message', packet => {
+            //     const res = JSON.parse(packet);
 
-                if(res.body.statusMessage) {
-                    if(/(Syntax error: |Too many)/g.test(res.body.statusMessage)) {
-                        module.exports.log(`[${new Date().toTimeString()}] ${res.body.statusMessage}`); // module.exports.log any errors or warnings send by Minecraft to the console
-                        module.exports.runCMD(`tellraw \"${commandSender}\" {"rawtext":[{"text":"${res.body.statusMessage}"}]}`)
-                    }
-                }
-                if (res.header.messagePurpose === 'event' && res.body.properties.Sender !== 'External') {
-                    if(res.body.eventName === 'PlayerMessage') {
-                        module.exports.log(res.body.properties.Message);
+            //     if(res.body.statusMessage) {
+            //         if(/(Syntax error: |Too many)/g.test(res.body.statusMessage)) {
+            //             module.exports.log(`[${new Date().toTimeString()}] ${res.body.statusMessage}`); // module.exports.log any errors or warnings send by Minecraft to the console
+            //             module.exports.runCMD(`tellraw \"${commandSender}\" {"rawtext":[{"text":"${res.body.statusMessage}"}]}`)
+            //         }
+            //     }
+            //     if (res.header.messagePurpose === 'event' && res.body.properties.Sender !== 'External') {
+            //         if(res.body.eventName === 'PlayerMessage') {
+            //             module.exports.log(res.body.properties.Message);
 
-                        module.exports.functionPacks.forEach(pack => {
-                            // Run correct function from pack.content and set log, config and send
-                        });
-                    }
-                }
-            });
+            //             module.exports.functionPacks.forEach(pack => {
+            //                 // Run correct function from pack.content and set log, config and send
+            //             });
+            //         }
+            //     }
+            // });
         });
         module.exports.server.listen(19131, () => {
             setTimeout(function() {

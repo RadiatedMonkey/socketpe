@@ -45,7 +45,13 @@ socket.on('displayInstalledPacks', data => {
     else {
         data.packs.forEach(pack => {
             installedPacksList.innerHTML += ` 
-                <div class="pack-info jumbotron bg-secondary text-white p-3 rounded">${pack.name}<button class="btn btn-light float-right uninstall-pack" disabled onclick="socket.emit('uninstallPack', {packName: '${pack.pack_name}'})">Uninstall</button></div>  
+                <div class="pack-info jumbotron bg-secondary p-3 rounded">
+                    <span class="text-white font-weight-bold">${pack.name} - v${String(pack.version.slice(0,3)).replace(/,/g, ".")}</span>
+                    <button class="btn btn-light float-right uninstall-pack" onclick="uninstallPack(${JSON.stringify(pack)})">Uninstall</button>
+                    <img class="pack-thumbnail float-left" src="${pack.thumbnail ? pack.thumbnail : 'https://github.com/RadiatedMonkey/socketpe-data/raw/master/thumbnail_placeholder.png'}" alt="${pack.name}'s thumbnail">
+                    <br>
+                    <span class="text-white font-weight-light">By ${pack.author}</span>
+                </div>  
             `;
         });
     }
