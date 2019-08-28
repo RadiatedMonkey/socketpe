@@ -1,0 +1,4 @@
+- Console now saves logged messages
+- Console won't display start server when a WSS is running anymore
+- Console can now send commands to WSS
+- Working on Function Pack Marketplace

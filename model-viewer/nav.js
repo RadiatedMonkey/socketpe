@@ -1,1 +1,0 @@
-const openURL=document.getElementsByClassName("nav-button")[0],openLocal=document.getElementsByClassName("nav-button")[1],exportBtn=document.getElementsByClassName("nav-button")[2];openURL.addEventListener("click",()=>{let b=prompt("URL");read(b)}),openLocal.addEventListener("click",()=>{let b=prompt("Model name");read(`models/${b}.json`)});
