@@ -26,14 +26,8 @@ nav {
     overflow-y: auto;
     overflow-x: hidden;
     overflow-wrap: break-word;
-    min-height: 90.25%;
+    height: 90.25%;
     padding-top: 1%;
-}
-#console-output::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px #00000030;
-    box-shadow: inset 0 0 6px #00000030;
-	border-radius: 10px;
-	background-color: #F5F5F5;
 }
 #console-titlebar {
     box-shadow: 0 5px 5px 0 #eeeeee25;

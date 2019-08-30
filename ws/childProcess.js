@@ -1,8 +1,9 @@
-const socketServer = require('./server');
-const universalEmitter = require('../common').universalEmitter;
+const path = require('path');
+const socketServer = require(path.join(__dirname, './server.js'));
+const universalEmitter = require(path.join(__dirname, '../common.js')).universalEmitter;
 
 universalEmitter.on('log', msg => {
-    process.send({purpose: 'logToConsole', content: msg});
+    process.send({purpose: 'log', content: msg});
 });
 
 process.on('message', data => {
@@ -12,9 +13,6 @@ process.on('message', data => {
             break;
         case 'stopServer':
             socketServer.stop();
-            universalEmitter.emit("log", "Succesfully closed server");
-            universalEmitter.removeAllListeners();
-            process.send('commitSuicide');
             break;
         case 'runCMD':
             socketServer.runCMD(data.content);

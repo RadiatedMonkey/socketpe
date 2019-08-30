@@ -1,16 +1,19 @@
 module.exports = {
     manifest: {
-        name: 'Example Function Pack',
-        thumbnail: 'https://abeon-hosting.com/images/minecraft-server-clipart-64x64-11.jpg',
+        name: 'Example Pack',
         author: 'RadiatedMonkey',
         version: [1,0,0],
-        uuid: '2ea96131-50cf-4335-8d49-64553cbab9c1'
+        uuid: '9bbe495c-92af-4aa9-982f-2472b3d3bc53'
     },
     __init__: () => {
-        module.exports.log('Example function initialized');
+        console.log(global);
     },
-    say: (res) => {
-        console.log(module.exports);
-        // module.exports.send(`say ${res.properties.Sender} said: ${res.properties.Message}`);
+    __connect__: () => {
+        send('tellraw @s {"rawtext":[{"text": "Connected to SocketPE"}]}');
+    },
+    PlayerMessage: res => {
+        if(res.properties.Sender !== 'External') {
+            console.log(`${res.properties.Sender}: ${res.properties.Message}`);
+        }
     }
 }

@@ -1,37 +1,34 @@
 process.title = 'SocketPE v0.2.0 - Created by RadiatedMonkey';
+process
+  .on('unhandledRejection', (reason, p) => {
+    console.error(reason, 'Unhandled Rejection at Promise', p);
+  })
+  .on('uncaughtException', err => {
+    console.error(err, 'Uncaught Exception thrown');
+    fs.writeFile('./errors.log', err, () => {
+        process.exit(1);
+    });
+  });
 
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-// const socketServer = require('./ws/server');
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 const childProcess = require('child_process');
-const wsProcess = childProcess.fork('./ws/childProcess');
-
-path.join(__dirname, '/ws');
-path.join(__dirname, '/common.js');
-
-path.join(__dirname, '/node_modules');
-path.join(__dirname, '/web'); // Make sure PKG puts the control panel files into the exe
+const wsProcess = childProcess.fork(path.join(__dirname, '/ws/childProcess.js'));
 
 app.use('/resources', express.static('web/resources'));
 app.use('/', express.static('web/console'));
 app.use('/docs', express.static('web/docs'));
 
 io.on('connection', socket => {
-
     wsProcess.send({purpose: 'updateServerData'});
 
     wsProcess.on('message', data => {
-        if(data.purpose === 'updateServerData') {
-            socket.emit('updateServerData', data.content);
-        } else if(data.purpose === 'logToConsole') {
-            socket.emit('log', {message: data.content});
-        } else if(data.purpose === 'commitSuicide') {
-            wsProcess.kill();
-        }
+        if(data.purpose === 'updateServerData') socket.emit('updateServerData', data.content);
+        else if(data.purpose === 'log') socket.emit('log', {message: data.content});
     });
 
     socket.on('changeState', data => {

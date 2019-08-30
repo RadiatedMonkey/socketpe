@@ -1,14 +1,23 @@
+const path = require('path');
 module.exports = {
     app: require('express')(),
     server: require('http').Server(module.exports.app),
+    //uuid: require(path.join(__dirname, '../node_modules/uuid')).v4,
     uuid: require('uuid/v4'),
     logHistory: [],
     controlSocket: null,
     mcSocket: null,
     wssRunning: false,
     functionPacks: [],
+    listenedEvents: {},
+    msgsSent: 0,
     log: msg => {
-        const universalEmitter = require('../common').universalEmitter;
+
+        if(typeof msg === 'object') {
+            msg = JSON.stringify(msg, null, 4).replace(/\n/g, "<br>").replace(/ /g, "&nbsp;");
+        }
+
+        const universalEmitter = require(path.join(__dirname, '../common')).universalEmitter;
         universalEmitter.emit('log', msg);
 
         module.exports.logHistory.push(msg);
@@ -40,21 +49,15 @@ module.exports = {
     start: () => {
         "use strict";
 
-        process.on('uncaughtException', err => {
-            fs.appendFileSync('../errors.module.exports.log', `[${new Date().toLocaleDateString()}: ${new Date().toLocaleTimeString()}] ${err}\n`);
-            module.exports.log(`Error occurred: ${err}`);
-        });
-
         module.exports.functionPacks = [];
 
         const WebSocket = require('ws');      // Requires
         const fs = require('fs');
-        const path = require('path');
                               
-        function subscribeChat() {
+        function subscribeEvent(event) {
             return JSON.stringify({
                 "body": {
-                    "eventName": "PlayerMessage"
+                    "eventName": event
                 },
                 "header": {
                     "requestId": module.exports.uuid(), // UUID
@@ -65,14 +68,10 @@ module.exports = {
             });
         }
 
-        // functionPacks should become an array of function files
-
-        fs.readdir(path.join(__dirname, '../functions'), (err, files) => {
-            if(err) module.exports.log(err);
-            else {
-                files.forEach(file => {
-                    module.exports.functionPacks.push(require(path.join(__dirname, `../functions/${file}`)));
-                });
+        let files = fs.readdirSync(path.join(__dirname, '../functions'));
+        files.forEach(file => {
+            if(!file.endsWith('.disabled')) {
+                module.exports.functionPacks.push(require(`../functions/${file}`));
             }
         });
 
@@ -81,47 +80,59 @@ module.exports = {
         module.exports.wss.on('listening', () => {
             module.exports.log('Server is running, connect to it with: /connect localhost:19131');
             module.exports.wssRunning = true;
-            console.log(module.exports.wssRunning);
 
             module.exports.functionPacks.forEach(pack => {
                 let tempPack = pack;
-                module.exports.log(pack);
-                delete tempPack.manifest;
+                delete tempPack.manifest; // Gets the event functions of a pack
                 delete tempPack.__init__;
-                module.exports.log(tempPack);
             });
+            module.exports.log(`Loaded ${module.exports.functionPacks.length } function packs`);
         });
 
         module.exports.wss.on('connection', socket => {
             module.exports.mcSocket = socket;
 
-            // socket.send(subscribeEvent(eventName));
-            // socket.on('message', packet => {
-            //     const res = JSON.parse(packet);
+            // Subscribe to events listed in function packs
 
-            //     if(res.body.statusMessage) {
-            //         if(/(Syntax error: |Too many)/g.test(res.body.statusMessage)) {
-            //             module.exports.log(`[${new Date().toTimeString()}] ${res.body.statusMessage}`); // module.exports.log any errors or warnings send by Minecraft to the console
-            //             module.exports.runCMD(`tellraw \"${commandSender}\" {"rawtext":[{"text":"${res.body.statusMessage}"}]}`)
-            //         }
-            //     }
-            //     if (res.header.messagePurpose === 'event' && res.body.properties.Sender !== 'External') {
-            //         if(res.body.eventName === 'PlayerMessage') {
-            //             module.exports.log(res.body.properties.Message);
+            module.exports.functionPacks.forEach(pack => {
+                delete pack.log;
+                delete pack.config;
+                delete pack.send;
 
-            //             module.exports.functionPacks.forEach(pack => {
-            //                 // Run correct function from pack.content and set log, config and send
-            //             });
-            //         }
-            //     }
-            // });
+                let eventFuncs = Object.keys(pack);
+                eventFuncs.forEach(eventFunc => socket.send(subscribeEvent(eventFunc)));
+
+                pack.__connect__ ? pack.__connect__() : null;
+            });
+
+            socket.on('message', packet => {
+                const res = JSON.parse(packet);
+                module.exports.functionPacks.forEach(pack => {
+                    delete pack.log;
+                    delete pack.config;
+                    delete pack.send;
+
+                    let funcs = Object.keys(pack);
+                    funcs.indexOf(res.body.eventName) >= 0 ? pack[res.body.eventName](res.body) : null;
+                });
+            });
         });
         module.exports.server.listen(19131, () => {
             setTimeout(function() {
                 module.exports.functionPacks.forEach(pack => {
-                    pack.log = module.exports.log;
-                    pack.config = module.exports.config;
-                    pack.send = module.exports.runCMD;
+                    let setGlobals = function() {
+                        global.console.log = module.exports.log;
+                        global.config = module.exports.config;
+                        global.send = module.exports.runCMD;
+                        global.loadDependency = dependency => {
+                            dependency = require(path.join(__dirname, './dependencies/', dependency + dependency.endsWith('.js') ? '' : '.js'));
+                            return dependency;
+                        };
+                    };
+                    pack.setGlobals = setGlobals;
+                    pack.setGlobals();
+                    delete pack.setGlobals;
+
                     pack.__init__ ? pack.__init__() : null;
                 });
             }, 500);

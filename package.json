@@ -2,9 +2,7 @@
   "name": "editpe",
   "version": "1.0.0",
   "description": "A WorldEdit-ish WebSocket server for Minecraft Bedrock Edition",
-  "main": "index.js",
   "dependencies": {
-    "ejs": "^2.6.2",
     "express": "^4.17.1",
     "socket.io": "^2.2.0",
     "uuid": "^3.3.3",
@@ -14,15 +12,18 @@
   "scripts": {
     "start": "node index.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Pathfinder6382/editpe.git"
-  },
   "keywords": [],
   "author": "RadiatedMonkey",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Pathfinder6382/editpe/issues"
-  },
-  "homepage": "https://github.com/Pathfinder6382/editpe#readme"
+  "main": "index.js",
+  "bin": "index.js",
+  "pkg": {
+    "scripts": [
+      "ws/*.js",
+      "node_modules/**/*.js"
+    ],
+    "assets": [
+      "wen/**/*"
+    ]
+   }
 }
