@@ -7,6 +7,6 @@ echo Installing dependencies...
 call npm install --prefix ../ express socket.io uuid ws
 cd ..
 cls
-echo Done, running 'socketpe ui' to start the server
+echo Dependencies installed! Running 'socketpe ui' to start the server
 color 07
 socketpe ui

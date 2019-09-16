@@ -1,6 +1,6 @@
 module.exports = {
     manifest: {
-        name: 'Example Pack',
+        name: 'Example Plugin',
         author: 'RadiatedMonkey',
         version: [1,0,0],
         uuid: '9bbe495c-92af-4aa9-982f-2472b3d3bc53'

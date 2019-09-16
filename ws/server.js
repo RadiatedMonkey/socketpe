@@ -5,7 +5,7 @@ module.exports = {
     //uuid: require(path.join(__dirname, '../node_modules/uuid')).v4,
     uuid: require('uuid/v4'),
     mcSocket: null,
-    functionPacks: [],
+    pluginPacks: [],
     listenedEvents: {},
     universalEmitter: require('../common').universalEmitter,
     log: msg => {
@@ -43,7 +43,7 @@ module.exports = {
     start: () => {
         "use strict";
 
-        module.exports.functionPacks = [];
+        module.exports.pluginPacks = [];
 
         const WebSocket = require('ws');      // Requires
         const fs = require('fs');
@@ -62,10 +62,10 @@ module.exports = {
             });
         }
 
-        let files = fs.readdirSync(path.join(__dirname, '../functions'));
+        let files = fs.readdirSync(path.join(__dirname, '../plugins'));
         files.forEach(file => {
             if(!file.endsWith('.disabled')) {
-                module.exports.functionPacks.push(require(`../functions/${file}`));
+                module.exports.pluginPacks.push(require(`../plugins/${file}`));
             }
         });
 
@@ -74,13 +74,13 @@ module.exports = {
         module.exports.wss.on('listening', () => {
             module.exports.log('Server is running, connect to it with: /connect localhost:19131');
 
-            module.exports.functionPacks.forEach(pack => {
+            module.exports.pluginPacks.forEach(pack => {
                 let tempPack = pack;
-                delete tempPack.manifest; // Gets the event functions of a pack
+                delete tempPack.manifest; // Gets the event plugins of a pack
                 delete tempPack.__init__;
                 delete tempPack.__connect__;
             });
-            module.exports.log(`Loaded ${module.exports.functionPacks.length } function packs`);
+            module.exports.log(`Loaded ${module.exports.pluginPacks.length } function packs`);
         });
 
         module.exports.wss.on('connection', socket => {
@@ -88,7 +88,7 @@ module.exports = {
 
             // Subscribe to events listed in function packs
 
-            module.exports.functionPacks.forEach(pack => {
+            module.exports.pluginPacks.forEach(pack => {
                 delete pack.log;
                 delete pack.config;
                 delete pack.send;
@@ -101,7 +101,7 @@ module.exports = {
 
             socket.on('message', packet => {
                 const res = JSON.parse(packet);
-                module.exports.functionPacks.forEach(pack => {
+                module.exports.pluginPacks.forEach(pack => {
                     delete pack.log;
                     delete pack.config;
                     delete pack.send;
@@ -113,7 +113,7 @@ module.exports = {
         });
         module.exports.server.listen(19131, () => {
             setTimeout(function() {
-                module.exports.functionPacks.forEach(pack => {
+                module.exports.pluginPacks.forEach(pack => {
                     let setGlobals = function() {
                         global.console.log = module.exports.log;
                         global.config = module.exports.config;

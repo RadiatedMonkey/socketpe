@@ -10,22 +10,33 @@ const childProcess = require('child_process');
 
 let wsProcess;
 
-function checkFunctions() {
-    const functions = fs.readdirSync(path.join(__dirname, '/functions'));
+function checkPlugins() {
+    const plugins = fs.readdirSync(path.join(__dirname, '/plugins'));
     let funcPacks = [];
     let skippedPacks = 0;
-    functions.forEach(file => {
-        let funcManifest = require(path.join(__dirname, '/functions/', file)).manifest;
-        funcManifest.pack_file = file;
-        if(funcManifest) funcPacks.push(funcManifest);
+    plugins.forEach(file => {
+        let funcManifest = require(path.join(__dirname, '/plugins/', file)).manifest;
+        if(funcManifest) {
+            funcManifest.pack_file = file;
+            funcPacks.push(funcManifest);
+        }
         else skippedPacks++;
     });
     return {packs: funcPacks, skippedPacks: skippedPacks};
 }
 
-if(process.argv[2] === 'ui') {
-
+function startServer() {
     wsProcess = childProcess.fork(path.join(__dirname, '/ws/childProcess.js'));
+
+    http.listen(80, err => {
+        if(err) console.log(err);
+        else {
+            console.log('Open http://localhost in your browser');
+        }
+    });
+}
+
+if(process.argv[2] === 'ui') {
 
     app.use('/resources', express.static('../web/resources'));
     app.use('/', express.static('../web/console'));
@@ -42,20 +53,18 @@ if(process.argv[2] === 'ui') {
 
         socket.on('changeState', data => {
             if(data.state) wsProcess.send({purpose: 'startServer'});
-            else {
-                wsProcess.send({purpose: 'stopServer', process: wsProcess});
-            }
+            else wsProcess.send({purpose: 'stopServer'});
         });
 
         socket.on('detectInstalledPacks', () => {
-            const funcs = checkFunctions();
+            const funcs = checkPlugins();
 
-            if(funcs.skippedPacks > 0) socket.emit({message: `Skipped ${funcs.skippedPacks} of the ${funcs.packs.length} function ${funcs.skippedPacks > 1 ? "packs" : "pack"}`});
+            if(funcs.skippedPacks > 0) socket.emit('log', {message: `${funcs.skippedPacks} plugins were not loaded because they do not have a manifest`});
             socket.emit("displayInstalledPacks", {packs: funcs.packs});
         });
 
         socket.on('uninstallPack', data => {
-            fs.rename(path.join(__dirname, '/functions/', data.pack_file), path.join(__dirname, '/functions/', data.pack.file, '.disabled'), err => {
+            fs.rename(path.join(__dirname, '/plugins/', data.pack_file), path.join(__dirname, '/plugins/', data.pack.file, '.disabled'), err => {
                 if(err) module.exports.log(`An error occurred:<br>${err}`);
             });
         });
@@ -64,23 +73,17 @@ if(process.argv[2] === 'ui') {
         socket.on('clearLogHistory', () => wsProcess.send({purpose: 'clearLogHistory'}));
     });
 
-    http.listen(80, err => {
-        if(err) console.log(err);
-        else {
-            console.log('Open http://localhost in your browser');
-        }
-    });
-
+    startServer();
 }
 
-else if(process.argv[2] === 'ls') {
-    const functions = checkFunctions();
-    if(functions.packs.length === 0) console.log("There are no functions installed");
+else if(process.argv[2] === 'plugins') {
+    const plugins = checkPlugins();
+    if(plugins.packs.length === 0) console.log("There are no plugins installed");
     else {
-        console.log(`There ${functions.packs.length > 1 ? "are" : "is"} ${functions.packs.length} function${functions.packs.length > 1 ? 's': ''} installed`);
+        console.log(`There are ${plugins.packs.length} plugins installed`);
 
-        functions.packs.forEach(pack => {
-            console.log(`- ${pack.name} - v${pack.version.join(".")}`);
+        plugins.packs.forEach(pack => {
+            console.log(`- ${pack.name} - v${pack.version.slice(0, 3).join(".")}`);
         });
     }
 }

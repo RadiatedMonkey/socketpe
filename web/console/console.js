@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', e => {
 socket.on('disconnect', () => {
     Swal.fire({
         type: 'error',
-        title: 'Disconnected',
-        text: 'Your SocketPE server went offline',
+        title: 'Disconnected from Server',
+        text: 'You have been disconnected from the backend server',
         showConfirmButton: false
     });
     serverStateChanger.textContent = 'Server unavailable';
@@ -25,8 +25,8 @@ socket.on('disconnect', () => {
 socket.on('reconnect', () => {
     Swal.fire({
         type: 'success',
-        title: 'Reconnected',
-        text: 'You have been reconnected to the server',
+        title: 'Reconnected to Server',
+        text: 'You have been reconnected to the backend server',
         showConfirmButton: false
     });
     clearSocketConsole();
@@ -38,17 +38,16 @@ socket.on('log', data => {
 });
 
 socket.on('displayInstalledPacks', data => {
-    console.log(data.packs.length);
     installedPacksList.classList.remove('row');
     installedPacksList.innerHTML = '';
-    if(data.packs.length === 0) installedPacksList.innerHTML = '<h5 class="text-dark text-center">No installed function packs detected</h5>';
+    if(data.packs.length === 0) installedPacksList.innerHTML = '<h5 class="text-dark text-center">No installed plugins detected</h5>';
     else {
         data.packs.forEach(pack => {
             installedPacksList.innerHTML += ` 
                 <div class="pack-info jumbotron bg-secondary p-3 rounded">
-                    <span class="text-white font-weight-bold">${pack.name} - v${String(pack.version.slice(0,3)).replace(/,/g, ".")}</span>
+                    <span class="text-white font-weight-bold">${pack.name} - v${pack.version.slice(0, 3).join(".")}</span>
                     <button class="btn btn-light float-right uninstall-pack" onclick="uninstallPack(${JSON.stringify(pack)})">Uninstall</button>
-                    <img class="pack-thumbnail float-left" src="${pack.thumbnail ? pack.thumbnail : 'https://github.com/RadiatedMonkey/socketpe-packs/raw/master/thumbnail_placeholder.png'}" alt="${pack.name}'s thumbnail">
+                    <img class="pack-thumbnail float-left" src="${pack.thumbnail ? pack.thumbnail : 'https://raw.githubusercontent.com/RadiatedMonkey/socketpe-packs/master/thumbnail_placeholder.png'}" alt="${pack.name}'s thumbnail">
                     <br />
                     <span class="text-white font-weight-light">By ${pack.author}</span>
                 </div>  
@@ -77,7 +76,7 @@ socket.on('noClient', () => {
     Swal.fire({
         type: 'error',
         title: 'No Client Connected',
-        text: 'Please connect to the WebSocket server before sending any commands',
+        text: 'Please connect Minecraft to the WebSocket server before sending any commands',
         showConfirmButton: false
     });
 });
@@ -98,7 +97,7 @@ serverStateChanger.addEventListener('click', e => {
 
 runCMDBtn.addEventListener('click', async () => {
     const { value: cmd } = await Swal.fire({
-        title: 'Send a command',
+        title: 'Send a Command',
         text: 'All commands are executed by the player that has connected to the server using /connect',
         input: 'text',
         inputValidator: value => {
