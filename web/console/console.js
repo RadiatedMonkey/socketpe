@@ -58,6 +58,7 @@ socket.on('displayInstalledPacks', data => {
 });
 
 socket.on('updateServerData', data => {
+    console.log(data);
     data.logHistory.forEach(log => {
         socketConsole.innerHTML += `<span>${log}</span>`;
     });
@@ -70,6 +71,15 @@ socket.on('updateServerData', data => {
         serverStateChanger.textContent = 'Start server';
         serverRunning = false;
     }
+});
+
+socket.on('noClient', () => {
+    Swal.fire({
+        type: 'error',
+        title: 'No Client Connected',
+        text: 'Please connect to the WebSocket server before sending any commands',
+        showConfirmButton: false
+    });
 });
 
 serverStateChanger.addEventListener('click', e => {
@@ -88,8 +98,8 @@ serverStateChanger.addEventListener('click', e => {
 
 runCMDBtn.addEventListener('click', async () => {
     const { value: cmd } = await Swal.fire({
-        title: 'Send a commamd',
-        text: 'All commands are executed by the player hosting the world',
+        title: 'Send a command',
+        text: 'All commands are executed by the player that has connected to the server using /connect',
         input: 'text',
         inputValidator: value => {
           if (!value) {

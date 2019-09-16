@@ -1,7 +1,7 @@
 {
-  "name": "editpe",
+  "name": "socketpe",
   "version": "1.0.0",
-  "description": "A WorldEdit-ish WebSocket server for Minecraft Bedrock Edition",
+  "description": "A WebSocket server with plugins for Minecraft Bedrock Edition",
   "dependencies": {
     "express": "^4.17.1",
     "socket.io": "^2.2.0",
@@ -9,21 +9,8 @@
     "ws": "^7.1.2"
   },
   "devDependencies": {},
-  "scripts": {
-    "start": "nodemon index.js"
-  },
   "keywords": [],
   "author": "RadiatedMonkey",
   "license": "ISC",
-  "main": "index.js",
-  "bin": "index.js",
-  "pkg": {
-    "scripts": [
-      "ws/*.js",
-      "node_modules/**/*.js"
-    ],
-    "assets": [
-      "wen/**/*"
-    ]
-  }
+  "main": "index.js"
 }

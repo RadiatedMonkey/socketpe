@@ -1,1 +1,1 @@
-ReferenceError: open is not defined
+Error [ERR_IPC_CHANNEL_CLOSED]: Channel closed

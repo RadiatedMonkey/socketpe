@@ -4,46 +4,40 @@ module.exports = {
     server: require('http').Server(module.exports.app),
     //uuid: require(path.join(__dirname, '../node_modules/uuid')).v4,
     uuid: require('uuid/v4'),
-    logHistory: [],
-    controlSocket: null,
     mcSocket: null,
-    wssRunning: false,
     functionPacks: [],
     listenedEvents: {},
-    msgsSent: 0,
+    universalEmitter: require('../common').universalEmitter,
     log: msg => {
 
         if(typeof msg === 'object') {
             msg = JSON.stringify(msg, null, 4).replace(/\n/g, "<br>").replace(/ /g, "&nbsp;");
         }
-
-        const universalEmitter = require(path.join(__dirname, '../common')).universalEmitter;
-        universalEmitter.emit('log', msg);
-
+        module.exports.universalEmitter.emit('log', msg);
         module.exports.logHistory.push(msg);
     },
     runCMD: cmd => {
-        module.exports.mcSocket.send(JSON.stringify({
-            "body": {
-                "origin": {
-                    "type": "player"
+        if(module.exports.mcSocket) {
+            module.exports.mcSocket.send(JSON.stringify({
+                "body": {
+                    "origin": {
+                        "type": "player"
+                    },
+                    "commandLine": cmd,
+                    "version": 1
                 },
-                "commandLine": cmd,
-                "version": 1
-            },
-            "header": {
-                "requestId": module.exports.uuid(),
-                "messagePurpose": "commandRequest",
-                "version": 1,
-                "messageType": "commandRequest"
-            }
-        }));
+                "header": {
+                    "requestId": module.exports.uuid(),
+                    "messagePurpose": "commandRequest",
+                    "version": 1,
+                    "messageType": "commandRequest"
+                }
+            }));
+        } else module.exports.universalEmitter.emit('noClient');
     },
     stop: () => { 
         module.exports.wss.close();
         module.exports.server.close();
-        module.exports.wssRunning = false;
-        module.exports.logHistory = [];
         module.exports.log('Server successfully closed');
     },
     start: () => {
@@ -79,12 +73,12 @@ module.exports = {
         
         module.exports.wss.on('listening', () => {
             module.exports.log('Server is running, connect to it with: /connect localhost:19131');
-            module.exports.wssRunning = true;
 
             module.exports.functionPacks.forEach(pack => {
                 let tempPack = pack;
                 delete tempPack.manifest; // Gets the event functions of a pack
                 delete tempPack.__init__;
+                delete tempPack.__connect__;
             });
             module.exports.log(`Loaded ${module.exports.functionPacks.length } function packs`);
         });
