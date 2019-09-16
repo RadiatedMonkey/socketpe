@@ -18,6 +18,7 @@ const path = require('path');
 const fs = require('fs');
 const childProcess = require('child_process');
 const wsProcess = childProcess.fork(path.join(__dirname, '/ws/childProcess.js'));
+const open = require('open');
 
 app.use('/resources', express.static('web/resources'));
 app.use('/', express.static('web/console'));
@@ -58,7 +59,7 @@ io.on('connection', socket => {
 
     socket.on('uninstallPack', data => {
         fs.rename(path.join(__dirname, '/functions/', data.pack_file), path.join(__dirname, '/functions/', data.pack.file, '.disabled'), err => {
-            if(err) module.exports.log(`An error occurred try to disabled the function pack:<br>${err}`);
+            if(err) module.exports.log(`An error occurred:<br>${err}`);
         });
     });
 
@@ -68,5 +69,8 @@ io.on('connection', socket => {
 
 http.listen(80, err => {
     if(err) console.log(err);
-    else console.log('Open http://localhost in your browser');
+    else {
+        console.log('Open http://localhost in your browser');
+        open("http://localhost:80");
+    }
 });

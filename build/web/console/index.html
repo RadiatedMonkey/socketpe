@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="shortcut icon" href="../resources/favicon.png">
+    <link rel="stylesheet" href="console.css">
+    <title>SocketPE - Control Panel</title>
+  </head>
+  <body>
+
+    <nav class="navbar navbar-light bg-secondary mb-5">
+      <span class="navbar-brand text-white h1">SocketPE</span>
+      <a href="/docs" class="btn btn-outline-light">Documentation</a>
+    </nav>
+              
+    <main>
+      <div class="row">
+        <div class="col">
+            <h3 class="text-center mb-5">Console</h3>
+            <hr />
+
+            <button class="btn btn-dark ml-4" id="serverStateChanger" disabled>Server unavailable</button>
+            <button class="btn btn-outline-dark ml-2" id="runCMD" disabled>Run command</button>
+            <button class="btn btn-outline-dark" id="clearConsole">Clear console</button>
+            <div id="console" class="bg-dark text-white m-4 pt-3">
+                <div class="bg-light p-3" id="console-titlebar">
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+                </div>
+                <div id="console-output"></div>
+            </div>
+        </div>
+        <div class="col">
+          <h3 class="text-center mb-5">Installed Function Packs</h3>
+          <hr />
+          <div id="packsContainer">
+            <button id="uninstallAll" class="btn btn-dark ml-4 mb-4">Uninstall All</button>
+            <div id="installed-packs" class="row ml-4 mb-2">
+              <div class="col-sm-1"></div>
+              <div class="col loader-container text-center mt-5">
+                  <div class="loader spinner-border text-dark mb-2"></div>
+                  <div class="loader-label text-dark font-weight-bold">Searching For Installed Packs...</div>
+              </div>
+              <div class="col-sm-1"></div>
+            </div>
+          </div>
+          <div class="row align-items-center">
+  </div>
+        </div>
+      </div>
+    </main>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
+    <script src="http://localhost/socket.io/socket.io.js"></script>
+    <script src="console.js"></script>  
+  </body>
+</html>

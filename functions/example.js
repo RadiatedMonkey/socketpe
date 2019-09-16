@@ -9,7 +9,7 @@ module.exports = {
         console.log(global);
     },
     __connect__: () => {
-        send('tellraw @s {"rawtext":[{"text": "Connected to SocketPE"}]}');
+        send('tellraw @s {"rawtext":[{"text": "Connected to server"}]}');
     },
     PlayerMessage: res => {
         if(res.properties.Sender !== 'External') {

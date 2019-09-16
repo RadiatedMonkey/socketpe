@@ -48,7 +48,7 @@ socket.on('displayInstalledPacks', data => {
                 <div class="pack-info jumbotron bg-secondary p-3 rounded">
                     <span class="text-white font-weight-bold">${pack.name} - v${String(pack.version.slice(0,3)).replace(/,/g, ".")}</span>
                     <button class="btn btn-light float-right uninstall-pack" onclick="uninstallPack(${JSON.stringify(pack)})">Uninstall</button>
-                    <img class="pack-thumbnail float-left" src="${pack.thumbnail ? pack.thumbnail : 'https://github.com/RadiatedMonkey/socketpe-resources/raw/master/thumbnail_placeholder.png'}" alt="${pack.name}'s thumbnail">
+                    <img class="pack-thumbnail float-left" src="${pack.thumbnail ? pack.thumbnail : 'https://github.com/RadiatedMonkey/socketpe-packs/raw/master/thumbnail_placeholder.png'}" alt="${pack.name}'s thumbnail">
                     <br />
                     <span class="text-white font-weight-light">By ${pack.author}</span>
                 </div>  
