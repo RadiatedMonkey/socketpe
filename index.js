@@ -1,5 +1,7 @@
 process.title = 'SocketPE v0.2.0 - Created by RadiatedMonkey';
 
+process.on('warning', e => console.log(e.stack));
+
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);

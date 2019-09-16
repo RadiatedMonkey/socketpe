@@ -11,9 +11,9 @@
   </head>
   <body>
 
-    <nav class="navbar navbar-light bg-secondary mb-5">
+    <nav class="navbar navbar-light bg-success mb-5">
       <span class="navbar-brand text-white h1">SocketPE</span>
-      <a href="/docs" class="btn btn-outline-light">Documentation</a>
+      <span class="border rounded text-white p-2" id="server-status">Status: Connected</span>
     </nav>
               
     <main>
@@ -22,7 +22,7 @@
             <h3 class="text-center mb-5">Console</h3>
             <hr />
 
-            <button class="btn btn-dark ml-4" id="serverStateChanger" disabled>Server unavailable</button>
+            <button class="btn btn-success ml-4" id="serverStateChanger" disabled>Server unavailable</button>
             <button class="btn btn-outline-dark ml-2" id="runCMD" disabled>Run command</button>
             <button class="btn btn-outline-dark" id="clearConsole">Clear console</button>
             <div id="console" class="bg-dark text-white m-4 pt-3">
@@ -38,7 +38,7 @@
           <h3 class="text-center mb-5">Installed Plugins</h3>
           <hr />
           <div id="packsContainer">
-            <button id="uninstallAll" class="btn btn-dark ml-4 mb-4">Uninstall All</button>
+            <button id="uninstallAll" class="btn btn-outline-success ml-4 mb-4" disabled>Store (Coming soon)</button>
             <div id="installed-packs" class="row ml-4 mb-2">
               <div class="col-sm-1"></div>
               <div class="col loader-container text-center mt-5">

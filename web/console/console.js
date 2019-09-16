@@ -4,6 +4,8 @@ const clearConsoleBtn = document.getElementById('clearConsole');
 const runCMDBtn = document.getElementById('runCMD');
 const socketConsole = document.getElementById('console-output');
 const installedPacksList = document.getElementById('installed-packs');
+const serverStatus = document.getElementById("server-status");
+
 let serverRunning = false;
 
 document.addEventListener('DOMContentLoaded', e => {
@@ -19,6 +21,7 @@ socket.on('disconnect', () => {
     });
     serverStateChanger.textContent = 'Server unavailable';
     serverStateChanger.disabled = true;
+    serverStatus.textContent = "Status: Not Connected";
     clearSocketConsole();
 });
 
@@ -31,6 +34,7 @@ socket.on('reconnect', () => {
     });
     clearSocketConsole();
     serverStateChanger.disabled = false;
+    serverStatus.textContent = "Status: Connected";
 });
 
 socket.on('log', data => {
@@ -44,10 +48,10 @@ socket.on('displayInstalledPacks', data => {
     else {
         data.packs.forEach(pack => {
             installedPacksList.innerHTML += ` 
-                <div class="pack-info jumbotron bg-secondary p-3 rounded">
+                <div class="pack-info jumbotron bg-success p-3 rounded">
                     <span class="text-white font-weight-bold">${pack.name} - v${pack.version.slice(0, 3).join(".")}</span>
                     <button class="btn btn-light float-right uninstall-pack" onclick="uninstallPack(${JSON.stringify(pack)})">Uninstall</button>
-                    <img class="pack-thumbnail float-left" src="${pack.thumbnail ? pack.thumbnail : 'https://raw.githubusercontent.com/RadiatedMonkey/socketpe-packs/master/thumbnail_placeholder.png'}" alt="${pack.name}'s thumbnail">
+                    <img class="pack-thumbnail float-left" src="${pack.thumbnail ? pack.thumbnail : 'https://raw.githubusercontent.com/RadiatedMonkey/socketpe-marketplace/master/thumbnail_placeholder.png'}" alt="${pack.name}'s thumbnail">
                     <br />
                     <span class="text-white font-weight-light">By ${pack.author}</span>
                 </div>  
