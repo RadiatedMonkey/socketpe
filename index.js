@@ -17,12 +17,14 @@ function checkPlugins() {
     let funcPacks = [];
     let skippedPacks = 0;
     plugins.forEach(file => {
-        let funcManifest = require(path.join(__dirname, '/plugins/', file)).manifest;
-        if(funcManifest) {
-            funcManifest.pack_file = file;
-            funcPacks.push(funcManifest);
+        if(file.endsWith(".js")) {
+            let funcManifest = require(path.join(__dirname, '/plugins/', file)).manifest;
+            if(funcManifest) {
+                funcManifest.pack_file = file;
+                funcPacks.push(funcManifest);
+            }
+            else skippedPacks++;
         }
-        else skippedPacks++;
     });
     return {packs: funcPacks, skippedPacks: skippedPacks};
 }
@@ -61,7 +63,7 @@ if(process.argv[2] === 'ui') {
         socket.on('detectInstalledPacks', () => {
             const funcs = checkPlugins();
 
-            if(funcs.skippedPacks > 0) socket.emit('log', {message: `${funcs.skippedPacks} plugins were not loaded because they do not have a manifest`});
+            if(funcs.skippedPacks > 0) socket.emit('log', {message: `${funcs.skippedPacks} plugins were skipped because they do not have a manifest`});
             socket.emit("displayInstalledPacks", {packs: funcs.packs});
         });
 

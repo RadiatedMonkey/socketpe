@@ -2,7 +2,6 @@ const path = require('path');
 module.exports = {
     app: require('express')(),
     server: require('http').Server(module.exports.app),
-    //uuid: require(path.join(__dirname, '../node_modules/uuid')).v4,
     uuid: require('uuid/v4'),
     mcSocket: null,
     pluginPacks: [],
@@ -18,21 +17,35 @@ module.exports = {
     },
     runCMD: cmd => {
         if(module.exports.mcSocket) {
-            module.exports.mcSocket.send(JSON.stringify({
-                "body": {
-                    "origin": {
-                        "type": "player"
+            
+            if(cmd.startsWith("__") && cmd.endsWith("__")) {
+
+                module.exports.pluginPacks.forEach(pack => {
+                    const packFunctions = Object.keys(pack);
+    
+                    if(packFunctions.includes(cmd)) pack[cmd]();
+                });
+
+            } else {
+
+                module.exports.mcSocket.send(JSON.stringify({
+                    "body": {
+                        "origin": {
+                            "type": "player"
+                        },
+                        "commandLine": cmd,
+                        "version": 1
                     },
-                    "commandLine": cmd,
-                    "version": 1
-                },
-                "header": {
-                    "requestId": module.exports.uuid(),
-                    "messagePurpose": "commandRequest",
-                    "version": 1,
-                    "messageType": "commandRequest"
-                }
-            }));
+                    "header": {
+                        "requestId": module.exports.uuid(),
+                        "messagePurpose": "commandRequest",
+                        "version": 1,
+                        "messageType": "commandRequest"
+                    }
+                }));
+                
+            }
+
         } else module.exports.universalEmitter.emit('noClient');
     },
     stop: () => { 
@@ -64,7 +77,7 @@ module.exports = {
 
         let files = fs.readdirSync(path.join(__dirname, '../plugins'));
         files.forEach(file => {
-            if(!file.endsWith('.disabled')) {
+            if(file.endsWith('.js')) {
                 module.exports.pluginPacks.push(require(`../plugins/${file}`));
             }
         });
@@ -73,13 +86,6 @@ module.exports = {
         
         module.exports.wss.on('listening', () => {
             module.exports.log('Server is running, connect to it with: /connect localhost:19131');
-
-            module.exports.pluginPacks.forEach(pack => {
-                let tempPack = pack;
-                delete tempPack.manifest; // Gets the event plugins of a pack
-                delete tempPack.__init__;
-                delete tempPack.__connect__;
-            });
             module.exports.log(`Loaded ${module.exports.pluginPacks.length } function packs`);
         });
 
@@ -112,9 +118,9 @@ module.exports = {
             });
         });
         module.exports.server.listen(19131, () => {
-            setTimeout(function() {
+            setTimeout(() => {
                 module.exports.pluginPacks.forEach(pack => {
-                    let setGlobals = function() {
+                    const setGlobals = () => {
                         global.console.log = module.exports.log;
                         global.config = module.exports.config;
                         global.send = module.exports.runCMD;

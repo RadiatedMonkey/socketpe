@@ -32,20 +32,20 @@ nav {
 #console-titlebar {
     box-shadow: 0 5px 5px 0 #eeeeee25;
 }
-#packsContainer {
-    height: 77.5%;
-}
-.pack-info {
-    width: 25vw;
-}
-.pack-thumbnail {
+.plugin-thumbnail {
     width: 64px;
     height: 64px;
     background: #fff;
+    border: solid 1px black;
+    border-radius: 50%;
     padding: 6px;
     margin-right: 20px;
-    border-radius: 10px;
     transform: translateY(-.35vw) translateX(-.2vw);
+}
+#plugin-list,
+.plugin-scrollspy {
+    height: 50vh;
+    overflow: auto;
 }
 .dot {
     height: 15px;
@@ -57,7 +57,7 @@ nav {
     background: #f00;
 }
 .dot:nth-child(2) {
-    background: #ffa500;
+    background: #fa5;
 }
 .dot:nth-child(3) {
     background: #080;

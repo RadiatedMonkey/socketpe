@@ -11,7 +11,7 @@
   </head>
   <body>
 
-    <nav class="navbar navbar-light bg-success mb-5">
+    <nav class="navbar navbar-light bg-primary mb-5">
       <span class="navbar-brand text-white h1">SocketPE</span>
       <span class="border rounded text-white p-2" id="server-status">Status: Connected</span>
     </nav>
@@ -22,7 +22,7 @@
             <h3 class="text-center mb-5">Console</h3>
             <hr />
 
-            <button class="btn btn-success ml-4" id="serverStateChanger" disabled>Server unavailable</button>
+            <button class="btn btn-primary ml-4" id="serverStateChanger" disabled>Server unavailable</button>
             <button class="btn btn-outline-dark ml-2" id="runCMD" disabled>Run command</button>
             <button class="btn btn-outline-dark" id="clearConsole">Clear console</button>
             <div id="console" class="bg-dark text-white m-4 pt-3">
@@ -35,21 +35,18 @@
             </div>
         </div>
         <div class="col">
-          <h3 class="text-center mb-5">Installed Plugins</h3>
+          <h3 class="text-center mb-5">Plugins</h3>
           <hr />
-          <div id="packsContainer">
-            <button id="uninstallAll" class="btn btn-outline-success ml-4 mb-4" disabled>Store (Coming soon)</button>
-            <div id="installed-packs" class="row ml-4 mb-2">
-              <div class="col-sm-1"></div>
-              <div class="col loader-container text-center mt-5">
-                  <div class="loader spinner-border text-dark mb-2"></div>
-                  <div class="loader-label text-dark font-weight-bold">Searching For Installed Plugins...</div>
-              </div>
-              <div class="col-sm-1"></div>
+          <div id="pluginMenuWrapper">
+            <button id="uninstallAll" class="btn btn-outline-primary ml-4 mb-4" disabled>Installed Plugins</button>
+            
+            <div id="pluginsListWrapper" class="row">
+                <div id="plugin-list" class="list-group col"></div>
+                <div data-spy="scroll" data-target="#plugin-list" data-offset="0" class="plugin-scrollspy col"></div>
             </div>
           </div>
           <div class="row align-items-center">
-  </div>
+        </div>
         </div>
       </div>
     </main>

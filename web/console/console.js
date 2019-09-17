@@ -42,19 +42,30 @@ socket.on('log', data => {
 });
 
 socket.on('displayInstalledPacks', data => {
-    installedPacksList.classList.remove('row');
-    installedPacksList.innerHTML = '';
-    if(data.packs.length === 0) installedPacksList.innerHTML = '<h5 class="text-dark text-center">No installed plugins detected</h5>';
+    if(data.packs.length === 0) pluginSpy.innerHTML = '<h5 class="text-dark text-center">No installed plugins detected</h5>';
     else {
-        data.packs.forEach(pack => {
-            installedPacksList.innerHTML += ` 
-                <div class="pack-info jumbotron bg-success p-3 rounded">
-                    <span class="text-white font-weight-bold">${pack.name} - v${pack.version.slice(0, 3).join(".")}</span>
-                    <button class="btn btn-light float-right uninstall-pack" onclick="uninstallPack(${JSON.stringify(pack)})">Uninstall</button>
-                    <img class="pack-thumbnail float-left" src="${pack.thumbnail ? pack.thumbnail : 'https://raw.githubusercontent.com/RadiatedMonkey/socketpe-marketplace/master/thumbnail_placeholder.png'}" alt="${pack.name}'s thumbnail">
-                    <br />
-                    <span class="text-white font-weight-light">By ${pack.author}</span>
-                </div>  
+        const pluginList = document.getElementById("plugin-list");
+        const pluginSpy = document.getElementsByClassName("plugin-scrollspy")[0];
+        data.packs.forEach((pack, idx) => {
+            pluginList.innerHTML += `
+                <a class="list-group-item list-group-item-action" href="#plugin-${idx}">${pack.name}</a>
+            `;
+            pluginSpy.innerHTML += `
+                <img class="plugin-thumbnail mt-3" src="${pack.thumbnail ? pack.thumbnail : 'https://github.com/RadiatedMonkey/socketpe-marketplace/raw/master/thumbnail_placeholder.png'}" alt="Thumbnail of ${pack.name}" />
+                <h5 id="plugin-${idx}" class="mb-2">${pack.name}</h5>
+                <p class="plugin-info">Version ${pack.version.join(".")} - Created by ${pack.author}</p>
+                <hr class="mb-3" />
+                
+                <div class="description-wrapper">
+                    <button class="btn btn-primary mb-3" type="button" data-toggle="collapse" data-target="#pluginDescription-${idx}" aria-expanded="false" aria-controls="pluginDescriptionCollapse">
+                        View Description
+                    </button>
+                    <div class="collapse" id="pluginDescription-${idx}">
+                        <div class="card card-body">
+                            ${pack.description ? pack.description : 'No Description Provided'}
+                        </div>
+                    </div>
+                </div>
             `;
         });
     }
@@ -123,4 +134,8 @@ clearConsoleBtn.addEventListener('click', e => {
 
 function clearSocketConsole() {
     socketConsole.innerHTML = '';
+}
+
+function openPackInfo(idx) {
+    alert(idx);
 }
