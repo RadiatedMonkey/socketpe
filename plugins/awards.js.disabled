@@ -1,0 +1,28 @@
+module.exports = {
+    manifest: {
+        name: "Server awards",
+        description: "Gives awards to players in the server",
+        dependencies: [],
+        thumbnail: 'https://lh3.googleusercontent.com/RfWcZlRlVcltGVdfP3JnZfru3hdQuOzskEJiS5NEcHejcmlTP2ZUSQ0K_XybWmktfZbw3ZfHOZoXgNXEQmOS0A=s400',
+        version: [1,0,0],
+        author: "RadiatedMonkey"
+    },
+
+    __config: {
+        awardInterval: 5,
+        maxAmount: 500,
+        isRandom: true
+    },
+
+    __connect: () => {
+        setInterval(module.exports.__giveAward, module.exports.__config.awardInterval * 1000);
+    },
+
+    __giveAward: () => {
+        send(`say Gave ${Math.floor(Math.random() * module.exports.__config.maxAmount)} coins to @r`);
+    },
+
+    PlayerMessage: res => {
+        console.log(`Player said: ${res.properties.Message}`);
+    }
+}
