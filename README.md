@@ -14,7 +14,7 @@ You can start the server by double-clicking ui.cmd
 
 ## Command Line Arguments
 
-Usage: socketpe \<command\>, or ui \<no commands\>
+Usage: socketpe \<command\>, or ui
 
         Commands:
 
