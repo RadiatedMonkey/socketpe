@@ -1,0 +1,4 @@
+# Please don't change anything, this file prevents git from uploading the node_modules folder.
+# The client has to download the modules using 'npm install'
+
+node_modules

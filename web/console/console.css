@@ -1,0 +1,64 @@
+body {
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+}
+nav {
+    box-shadow: 0 10px 10px 0 #dddddd25;
+}
+#console {
+    display: block;
+    height: 500px;
+    font-family: monospace;
+    background-color: #fff;
+    margin: auto 0;
+    padding: 0;
+    border-radius: .25em;
+    box-shadow: 0.1em 0.1em 0.5em rgba(0, 0, 0, 0.45);
+    line-height: 0;
+}
+#console-output span {
+    display: block;
+    line-height: 1.5rem;
+    margin-left: 1em;
+}
+#console-output {
+    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-wrap: break-word;
+    height: 90.25%;
+    padding-top: 1%;
+}
+#console-titlebar {
+    box-shadow: 0 5px 5px 0 #eeeeee25;
+}
+.plugin-thumbnail {
+    width: 64px;
+    height: 64px;
+    background: #fff;
+    border: solid 1px black;
+    border-radius: 50%;
+    padding: 6px;
+    margin-right: 20px;
+    transform: translateY(-.35vw) translateX(-.2vw);
+}
+#plugin-list,
+.plugin-scrollspy {
+    height: 50vh;
+    overflow: auto;
+}
+.dot {
+    height: 15px;
+    width: 15px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.dot:nth-child(1) {
+    background: #f00;
+}
+.dot:nth-child(2) {
+    background: #fa5;
+}
+.dot:nth-child(3) {
+    background: #080;
+}

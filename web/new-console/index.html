@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>SocketPE - Console</title>
+        <link rel="stylesheet" href="styles.css" />
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script defer src="./console.js"></script>
+    </head>
+    <body>
+
+        <nav>
+            <h3>SocketPE</h3>
+        </nav>
+
+        <div class="view-container">
+
+        <main id="content">
+
+            <section id="console">
+
+                <div id="console-controls">
+                    <button id="serverStateChanger">Start Server</button>
+                    <button id="clearConsole">Clear</button>
+                    <button id="runCMD">Command</button>
+                </div>
+
+                <div id="console-title-bar">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+
+                <div id="console-content"></div>
+
+            </section>
+
+            <section id="plugins">
+                <main id="plugin-list">                    
+                    <div class="plugin" data-plugin-name="example">
+                        <div class="plugin-flex">
+                            <div class="title-bar">
+                                <h3>Example Plugin</h3>
+                                <p>Created by User</p>
+                            </div>
+                            <hr />
+
+                            <img src="/resources/favicon.png" alt="example-thumbnail" />
+                        </div>
+
+                        <div class="plugin-actions">
+                            <button>Configuration</button>
+                            <button>Disable</button>
+                        </div>
+
+                    </div>
+
+                </main>
+
+
+            </section>
+
+        </main>
+
+        </div>
+
+    </body>
+</html>

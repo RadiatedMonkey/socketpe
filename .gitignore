@@ -1,0 +1,6 @@
+node_modules
+uuid
+uuid.cmd
+.vscode
+plugins
+nodemon.json
