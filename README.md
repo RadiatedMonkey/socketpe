@@ -16,10 +16,7 @@ You can start the server by double-clicking ui.cmd
 
 Usage: socketpe \<command\>, or ui \<no commands\>
 
-
         Commands:
-
-
 
         - ui - **Start the UI server**
 
