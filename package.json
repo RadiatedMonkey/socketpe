@@ -1,6 +1,6 @@
 {
   "name": "socketpe",
-  "version": "0.3.0",
+  "version": "0.5.0",
   "description": "A WebSocket server with plugins for Minecraft Bedrock Edition",
   "dependencies": {
     "discord.js": "^11.5.1",

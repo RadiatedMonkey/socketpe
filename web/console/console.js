@@ -51,7 +51,7 @@ socket.on('displayInstalledPacks', data => {
                 <a class="list-group-item list-group-item-action" href="#plugin-${idx}">${pack.name}</a>
             `;
             pluginSpy.innerHTML += `
-                <img class="plugin-thumbnail mt-3" src="${pack.thumbnail ? pack.thumbnail : 'https://github.com/RadiatedMonkey/socketpe-marketplace/raw/master/thumbnail_placeholder.png'}" alt="Thumbnail of ${pack.name}" />
+                <img class="plugin-thumbnail mt-3" src="${pack.thumbnail ? pack.thumbnail : 'http://localhost/resources/thumbnail-placeholder.jpg'}" alt="Thumbnail of ${pack.name}" />
                 <h5 id="plugin-${idx}" class="mb-2">${pack.name}</h5>
                 <p class="plugin-info">Version ${pack.version.join(".")} - Created by ${pack.author}</p>
                 <hr class="mb-3" />
