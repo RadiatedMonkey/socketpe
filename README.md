@@ -16,12 +16,12 @@ You can start the server by double-clicking ui.cmd
 
 Usage: socketpe \<command\>, or ui
 
-        Commands:
+Commands:
 
-        - ui - **Start the UI server**
+- ui - **Start the UI server**
 
-        - plugins - **Show all installed plugins**
+- plugins - **Show all installed plugins**
 
-            - list - **Show all installed plugins**
+    - list - **Show all installed plugins**
 
-            - edit \<plugin\> **Open the plugin file**
+    - edit \<plugin\> **Open the plugin file**
