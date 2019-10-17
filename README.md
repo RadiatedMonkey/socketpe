@@ -56,4 +56,5 @@ Commands:
 You can execute a Minecraft command by clicking on the 'Run Command' button on the console page.
 
 I have changed the commands a little bit, you can use <<>> to run JavaScript.
-Example: say << 1 + 1 >>, this turns into say 2
+Example: say << 1 + 1 >>,
+this turns into say 2
