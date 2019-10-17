@@ -135,7 +135,7 @@ else if(process.argv[2] === 'plugins') {
             }
             break;
 
-        case 'config':
+        case 'edit':
 
             fs.readdir(path.join(__dirname, '/plugins'), (err, files) => {
 
