@@ -77,11 +77,8 @@ const socketFunctions = {
 
 if(process.argv[2] === 'ui') {
 
-    require("./web/new-console/compile.js")();
-
     app.use('/resources', express.static('web/resources'));
     app.use('/', express.static('web/console'));
-    app.use('/new', express.static('web/new-console'));
 
     app.get('/search', (req, res) => {
         res.send(req.query);
