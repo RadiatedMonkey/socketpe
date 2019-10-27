@@ -1,0 +1,16 @@
+{
+    "permissions": {
+        "sphere": ["XxCubedEarthxX", "ToP ZaPPeRzZ"],
+        "set": ["XxCubedEarthxX", "ToP ZaPPeRzZ"],
+        "permission": ["XxCubedEarthxX", "ToP ZaPPeRzZ"]
+    },
+
+    "limits": {
+        "set_size": -1,
+        "sphere_radius": 100
+    },
+
+    "general": {
+        "command_delay": 5
+    }
+}
